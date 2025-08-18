@@ -1,0 +1,16 @@
+BasedOnStyle: Google
+BreakBeforeBraces: Allman
+IndentWidth: 4
+ColumnLimit: 100
+AccessModifierOffset: -4
+SeparateDefinitionBlocks: Always
+
+DerivePointerAlignment: false
+PointerAlignment: Left
+
+SpacesInAngles: false
+ConstructorInitializerIndentWidth: 4
+
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+IndentPPDirectives: BeforeHash 

@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include "entity_manager.hpp"
+
+#include <gtest/gtest.h>
 
 TEST(EntityManagerTest, CreateIsAlive)
 {

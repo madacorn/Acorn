@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include "entity.hpp"
+
+#include <gtest/gtest.h>
 
 static_assert(acorn::Entity::null().is_null());
 static_assert(acorn::Entity{}.is_null());
