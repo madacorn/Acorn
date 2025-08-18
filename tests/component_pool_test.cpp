@@ -106,9 +106,9 @@ TEST(ComponentPoolTest, RemoveLastFastPath)
     auto b = em.create();
 
     pool.emplace(a, 1);
-    pool.emplace(b, 2);  // b is last
+    pool.emplace(b, 2);
 
-    EXPECT_TRUE(pool.remove(b));  // no swap
+    EXPECT_TRUE(pool.remove(b));
     EXPECT_TRUE(pool.has(a));
     EXPECT_FALSE(pool.has(b));
     EXPECT_EQ(*pool.try_get(a), 1);
@@ -120,10 +120,10 @@ TEST(ComponentPoolTest, RemoveAbsentReturnsFalse)
     acorn::ComponentPool<int> pool(em);
 
     auto e = em.create();
-    EXPECT_FALSE(pool.remove(e));  // never added
+    EXPECT_FALSE(pool.remove(e));
     pool.emplace(e, 1);
     EXPECT_TRUE(pool.remove(e));
-    EXPECT_FALSE(pool.remove(e));  // second time = false
+    EXPECT_FALSE(pool.remove(e));
 }
 
 TEST(ComponentPoolTest, IterateVisitsAll)
@@ -169,7 +169,7 @@ TEST(ComponentPoolTest, GetReturnsReference)
     pool.emplace(e, 5);
     int& ref = pool.get(e);
     ref = 9;
-    EXPECT_EQ(*pool.try_get(e), 9);  // proves aliasing, not a copy
+    EXPECT_EQ(*pool.try_get(e), 9);
 }
 
 TEST(ComponentPoolTest, ConstTryGetAndGet)
