@@ -152,3 +152,17 @@ TEST(WorldTest, ConstTryGetAndGetThroughWorld)
     EXPECT_EQ(*p, 11);
     EXPECT_EQ(cw.get<int>(e), 11);
 }
+
+TEST(WorldTest, DestroyEntityCleansUpComponents)
+{
+    World w;
+    Entity e = w.create_entity();
+    w.add<int>(e, 10);
+
+    ASSERT_TRUE(w.has<int>(e));
+
+    w.destroy_entity(e);
+
+    EXPECT_EQ(w.pool<int>().size(), 0);
+    EXPECT_FALSE(w.has<int>(e));
+}

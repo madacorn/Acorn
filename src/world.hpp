@@ -22,6 +22,13 @@ public:
 
     bool destroy_entity(Entity e)
     {
+        if (!em_.is_alive(e))
+            return false;
+
+        for (auto& [type, pool_ptr] : pools_)
+        {
+            pool_ptr->remove(e);
+        }
         return em_.destroy(e);
     }
 
@@ -137,6 +144,7 @@ private:
     struct IPool
     {
         virtual ~IPool() = default;
+        virtual bool remove(Entity e) noexcept = 0;
     };
 
     template <typename T>
@@ -145,6 +153,11 @@ private:
         ComponentPool<T> pool;
 
         explicit PoolBox(const EntityManager& em) : pool(em) {}
+
+        bool remove(Entity e) noexcept override
+        {
+            return pool.remove(e);
+        }
     };
 
     EntityManager em_;
