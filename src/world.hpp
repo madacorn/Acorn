@@ -24,7 +24,7 @@ public:
         return em_.destroy(e);
     }
 
-    template <class T>
+    template <typename T>
     ComponentPool<T>& pool()
     {
         const auto key = std::type_index(typeid(T));
@@ -39,7 +39,7 @@ public:
         return static_cast<PoolBox<T>*>(it->second.get())->pool;
     }
 
-    template <class T>
+    template <typename T>
     const ComponentPool<T>& pool() const
     {
         const auto key = std::type_index(typeid(T));
@@ -48,7 +48,7 @@ public:
         return static_cast<const PoolBox<T>*>(it->second.get())->pool;
     }
 
-    template <class T>
+    template <typename T>
     bool has(Entity e) const
     {
         if (const auto* p = try_pool<T>())
@@ -56,7 +56,7 @@ public:
         return false;
     }
 
-    template <class T>
+    template <typename T>
     T* try_get(Entity e)
     {
         if (auto* p = try_pool<T>())
@@ -64,7 +64,7 @@ public:
         return nullptr;
     }
 
-    template <class T>
+    template <typename T>
     const T* try_get(Entity e) const
     {
         if (const auto* p = try_pool<T>())
@@ -72,7 +72,7 @@ public:
         return nullptr;
     }
 
-    template <class T>
+    template <typename T>
     T& get(Entity e)
     {
         if (auto* p = try_pool<T>())
@@ -80,7 +80,7 @@ public:
         throw std::logic_error("get<T> on entity without pool");
     }
 
-    template <class T>
+    template <typename T>
     const T& get(Entity e) const
     {
         if (const auto* p = try_pool<T>())
@@ -88,13 +88,13 @@ public:
         throw std::logic_error("get<T> on entity without pool");
     }
 
-    template <class T, class... A>
+    template <typename T, typename... A>
     T& add(Entity e, A&&... args)
     {
         return pool<T>().emplace(e, std::forward<A>(args)...);
     }
 
-    template <class T>
+    template <typename T>
     bool remove(Entity e)
     {
         if (auto* p = try_pool<T>())
@@ -103,7 +103,7 @@ public:
     }
 
 private:
-    template <class T>
+    template <typename T>
     ComponentPool<T>* try_pool() noexcept
     {
         auto it = pools_.find(std::type_index(typeid(T)));
@@ -112,7 +112,7 @@ private:
         return &static_cast<PoolBox<T>*>(it->second.get())->pool;
     }
 
-    template <class T>
+    template <typename T>
     const ComponentPool<T>* try_pool() const noexcept
     {
         auto it = pools_.find(std::type_index(typeid(T)));
@@ -126,7 +126,7 @@ private:
         virtual ~IPool() = default;
     };
 
-    template <class T>
+    template <typename T>
     struct PoolBox final : IPool
     {
         ComponentPool<T> pool;

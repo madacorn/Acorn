@@ -9,7 +9,7 @@
 
 namespace acorn
 {
-template <class T>
+template <typename T>
 class ComponentPool
 {
 public:
@@ -66,7 +66,7 @@ public:
         throw std::logic_error("get<T> on entity without component");
     }
 
-    template <class... Args>
+    template <typename... Args>
     T& emplace(Entity e, Args&&... args)
     {
         ACORN_ASSERT(em_.is_alive(e));
