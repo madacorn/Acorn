@@ -1,0 +1,32 @@
+name: Performance Benchmarks
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build Benchmarks
+        run: |
+          cmake -S . -B build -DBUILD_BENCHMARKS=ON -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+
+      - name: Run Benchmarks
+        run: ./build/acorn_bench --benchmark_format=json | tee benchmark_result.json
+
+      - name: Store and Compare Results
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'googlecpp'
+          output-file-path: benchmark_result.json
+          external-data-json-path: ./cache/benchmark-data.json
+          fail-on-alert: true
+          comment-on-alert: true
+          # Still working on the lib so this is useless
+          # alert-threshold: '120%'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true

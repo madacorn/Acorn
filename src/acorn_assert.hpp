@@ -56,5 +56,7 @@ inline void assert_fail(const char* expr, const char* file, int line, const char
                 ::acorn::detail::assert_fail(#cond, __FILE__, __LINE__, __func__, __VA_ARGS__); \
             }                                                                                   \
         } while (0)
-
+#else
+    #define ACORN_ASSERT(cond) (void)0
+    #define ACORN_ASSERT_MSG(cond, ...) (void)0
 #endif

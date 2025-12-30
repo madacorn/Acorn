@@ -27,3 +27,21 @@ if (BUILD_TESTS)
     include(GoogleTest)
     gtest_discover_tests(${PROJECT_NAME}_tests)
 endif()
+
+if (BUILD_BENCHMARKS)
+    include(FetchContent)
+
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+
+    FetchContent_Declare(
+        google_benchmark
+        URL https://github.com/google/benchmark/archive/refs/heads/main.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    FetchContent_MakeAvailable(google_benchmark)
+
+    add_executable(${PROJECT_NAME}_bench benchmarks/main_bench.cpp)
+    target_link_libraries(${PROJECT_NAME}_bench PRIVATE ${PROJECT_NAME} benchmark::benchmark)
+endif()
