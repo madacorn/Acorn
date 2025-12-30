@@ -67,7 +67,6 @@ static void BM_ViewIteration(benchmark::State& state)
     state.SetItemsProcessed(state.iterations() * (entity_count / 2));
 }
 
-// Run for 1,000 and 10,000 entities
 BENCHMARK(BM_ViewIteration)->Range(1000, 10000);
 
 BENCHMARK_MAIN();
