@@ -8,6 +8,7 @@
 #include "component_pool.hpp"
 #include "entity.hpp"
 #include "entity_manager.hpp"
+#include "view.hpp"
 
 namespace acorn
 {
@@ -100,6 +101,18 @@ public:
         if (auto* p = try_pool<T>())
             return p->remove(e);
         return false;
+    }
+
+    template <typename... Components>
+    [[nodiscard]] auto view()
+    {
+        return View{pool<Components>()...};
+    }
+
+    template <typename... Components>
+    [[nodiscard]] const auto view() const
+    {
+        return View{pool<Components>()...};
     }
 
 private:

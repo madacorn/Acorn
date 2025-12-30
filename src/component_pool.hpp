@@ -66,6 +66,11 @@ public:
         throw std::logic_error("get<T> on entity without component");
     }
 
+    [[nodiscard]] const std::vector<Entity>& entities() const noexcept
+    {
+        return dense_entities_;
+    }
+
     template <typename... Args>
     T& emplace(Entity e, Args&&... args)
     {
