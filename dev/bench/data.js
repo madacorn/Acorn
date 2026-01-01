@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1767113882073,
+  "lastUpdate": 1767284254887,
   "repoUrl": "https://github.com/madacorn/Acorn",
   "entries": {
     "Benchmark": [
@@ -108,6 +108,60 @@ window.BENCHMARK_DATA = {
             "value": 262087.12735492006,
             "unit": "ns/iter",
             "extra": "iterations: 2654\ncpu: 262046.17897513183 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "codingstain@gmail.com",
+            "name": "madacorn",
+            "username": "madacorn"
+          },
+          "committer": {
+            "email": "codingstain@gmail.com",
+            "name": "madacorn",
+            "username": "madacorn"
+          },
+          "distinct": true,
+          "id": "ae8e48f2909463888f5cac053bac7672367b4685",
+          "message": "Fix missing operator== and !=",
+          "timestamp": "2026-01-01T17:16:42+01:00",
+          "tree_id": "dd1d5a99f077a209a5607520b6055865355fb55b",
+          "url": "https://github.com/madacorn/Acorn/commit/ae8e48f2909463888f5cac053bac7672367b4685"
+        },
+        "date": 1767284254632,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_EntityCreation",
+            "value": 2.1448352565849857,
+            "unit": "ns/iter",
+            "extra": "iterations: 346029794\ncpu: 2.1446478738764325 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ComponentAdd",
+            "value": 15.7061903428949,
+            "unit": "ns/iter",
+            "extra": "iterations: 44651953\ncpu: 15.704785925041175 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/1000",
+            "value": 26216.843069570437,
+            "unit": "ns/iter",
+            "extra": "iterations: 26362\ncpu: 26214.05504134739 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/4096",
+            "value": 109069.62801556008,
+            "unit": "ns/iter",
+            "extra": "iterations: 6425\ncpu: 109063.36155642023 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/10000",
+            "value": 265941.62485703186,
+            "unit": "ns/iter",
+            "extra": "iterations: 2623\ncpu: 265908.8189096454 ns\nthreads: 1"
           }
         ]
       }
