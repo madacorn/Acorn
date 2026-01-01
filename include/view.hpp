@@ -59,15 +59,7 @@ public:
             return *this;
         }
 
-        bool operator==(const Iterator& other) const
-        {
-            return index_ == other.index_;
-        }
-
-        bool operator!=(const Iterator& other) const
-        {
-            return index_ != other.index_;
-        }
+        bool operator==(const Iterator& other) const = default;
 
     private:
         void move_to_valid()
