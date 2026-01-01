@@ -27,15 +27,17 @@ TEST(ViewTest, FiltersEntitiesWithMultipleComponents)
 
     world.add<int>(e1, 10);
     world.add<float>(e1, 1.0f);
-
     world.add<int>(e2, 20);
 
     auto view = world.view<int, float>();
 
     size_t count = 0;
-    for (auto e : view)
+
+    for (auto [e, i, f] : view)
     {
-        EXPECT_TRUE(e1 == e);
+        EXPECT_EQ(e1, e);
+        EXPECT_EQ(i, 10);
+        EXPECT_EQ(f, 1.0f);
         count++;
     }
     EXPECT_EQ(count, 1);
@@ -57,9 +59,11 @@ TEST(ViewTest, MultipleComponentPartialMatch)
     auto view = world.view<int, float, char>();
 
     size_t count = 0;
-    for (auto e : view)
+
+    for (auto [e, i, f, c] : view)
     {
-        EXPECT_TRUE(e1 == e);
+        EXPECT_EQ(e1, e);
+        EXPECT_EQ(c, 'a');
         count++;
     }
     EXPECT_EQ(count, 1);

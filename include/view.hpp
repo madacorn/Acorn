@@ -13,6 +13,12 @@ template <typename... Pools>
 class View
 {
 public:
+    template <typename Pool>
+    auto& get_component(Entity e) const
+    {
+        return std::get<Pool&>(pools_).get(e);
+    }
+
     View(Pools&... pools) : pools_(std::forward_as_tuple(pools...))
     {
         size_t min_size = std::numeric_limits<size_t>::max();
@@ -47,9 +53,11 @@ public:
             move_to_valid();
         }
 
-        Entity operator*() const
+        auto operator*() const
         {
-            return (*view_.lead_entities_)[index_];
+            return std::forward_as_tuple(
+                (*view_.lead_entities_)[index_],
+                view_.template get_component<Pools>((*view_.lead_entities_)[index_])...);
         }
 
         Iterator& operator++()
