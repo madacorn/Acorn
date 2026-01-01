@@ -191,7 +191,8 @@ TEST(ComponentPoolTest, GetAbsentThrows)
     acorn::EntityManager em;
     acorn::ComponentPool<int> pool(em);
     auto e = em.create();
-    EXPECT_THROW((void)pool.get(e), std::logic_error);
+
+    EXPECT_THROW((void)pool.get(e), std::out_of_range);
 }
 
 TEST(ComponentPoolTest, ReAddAfterRemoveWorks)

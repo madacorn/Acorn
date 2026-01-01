@@ -78,9 +78,16 @@ TEST(WorldTest, GetAbsentThrows)
 {
     World w;
     Entity e = w.create_entity();
-    EXPECT_THROW((void)w.get<int>(e), std::logic_error);
+    EXPECT_THROW((void)w.get<int>(e), std::out_of_range);
 
-    EXPECT_THROW((void)w.get<CompA>(e), std::logic_error);
+    EXPECT_THROW((void)w.get<CompA>(e), std::out_of_range);
+}
+
+TEST(WorldTest, ConstPoolMissingThrows)
+{
+    const World w;
+
+    EXPECT_THROW((void)w.pool<int>(), std::runtime_error);
 }
 
 TEST(WorldTest, TryGetReturnsNullWhenPoolMissingOrAbsent)
