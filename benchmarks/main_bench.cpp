@@ -51,16 +51,12 @@ static void BM_ViewIteration(benchmark::State& state)
             world.add<Velocity>(e, 0.1f, 0.1f);
         }
     }
-
     for (auto _ : state)
     {
         auto view = world.view<Position, Velocity>();
-        for (auto e : view)
+        for (auto [e, pos, vel] : view)
         {
-            auto& pos = world.get<Position>(e);
-            auto& vel = world.get<Velocity>(e);
             pos.x += vel.dx;
-            pos.y += vel.dy;
             benchmark::DoNotOptimize(pos);
         }
     }
@@ -88,9 +84,8 @@ static void BM_ViewIteration_SparseMatch(benchmark::State& state)
     for (auto _ : state)
     {
         auto view = world.view<Position, Velocity>();
-        for (auto e : view)
+        for (auto [e, pos, vel] : view)
         {
-            auto& pos = world.get<Position>(e);
             benchmark::DoNotOptimize(pos);
         }
     }
@@ -111,9 +106,8 @@ static void BM_ViewIteration_SingleComponent(benchmark::State& state)
     for (auto _ : state)
     {
         auto view = world.view<Position>();
-        for (auto e : view)
+        for (auto [e, pos] : view)
         {
-            auto& pos = world.get<Position>(e);
             benchmark::DoNotOptimize(pos);
         }
     }
