@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1767284568916,
+  "lastUpdate": 1767285954419,
   "repoUrl": "https://github.com/madacorn/Acorn",
   "entries": {
     "Benchmark": [
@@ -252,6 +252,96 @@ window.BENCHMARK_DATA = {
             "value": 156947.7283733211,
             "unit": "ns/iter",
             "extra": "iterations: 4543\ncpu: 156936.84437596286 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "codingstain@gmail.com",
+            "name": "madacorn",
+            "username": "madacorn"
+          },
+          "committer": {
+            "email": "codingstain@gmail.com",
+            "name": "madacorn",
+            "username": "madacorn"
+          },
+          "distinct": true,
+          "id": "146a94d3744543460c7ad8cd2373982d9aadf829",
+          "message": "Missing files",
+          "timestamp": "2026-01-01T17:45:03+01:00",
+          "tree_id": "dd4631b923042a70b7159d97f5e0502d05e3dc47",
+          "url": "https://github.com/madacorn/Acorn/commit/146a94d3744543460c7ad8cd2373982d9aadf829"
+        },
+        "date": 1767285954043,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_EntityCreation",
+            "value": 3.6343239157107057,
+            "unit": "ns/iter",
+            "extra": "iterations: 195844153\ncpu: 3.6339090654393957 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ComponentAdd",
+            "value": 15.797678359934055,
+            "unit": "ns/iter",
+            "extra": "iterations: 44239588\ncpu: 15.794479189091906 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/1000",
+            "value": 4435.677076222966,
+            "unit": "ns/iter",
+            "extra": "iterations: 158220\ncpu: 4434.911679939325 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/4096",
+            "value": 18283.187917521238,
+            "unit": "ns/iter",
+            "extra": "iterations: 38022\ncpu: 18281.069591289262 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/10000",
+            "value": 46707.55142933509,
+            "unit": "ns/iter",
+            "extra": "iterations: 14972\ncpu: 46700.8889259952 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/1000",
+            "value": 132.17965212100748,
+            "unit": "ns/iter",
+            "extra": "iterations: 5381239\ncpu: 132.1678470329974 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/4096",
+            "value": 385.42850652764616,
+            "unit": "ns/iter",
+            "extra": "iterations: 1822558\ncpu: 385.3849803408174 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/10000",
+            "value": 889.9732334128599,
+            "unit": "ns/iter",
+            "extra": "iterations: 788894\ncpu: 889.9084490438518 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/1000",
+            "value": 4665.199161131954,
+            "unit": "ns/iter",
+            "extra": "iterations: 149964\ncpu: 4664.67890960498 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/4096",
+            "value": 19100.00992555847,
+            "unit": "ns/iter",
+            "extra": "iterations: 36673\ncpu: 19098.709077522984 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/10000",
+            "value": 47967.42792762079,
+            "unit": "ns/iter",
+            "extra": "iterations: 14645\ncpu: 47959.956162512775 ns\nthreads: 1"
           }
         ]
       }
