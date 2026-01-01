@@ -56,14 +56,16 @@ public:
     {
         if (auto* p = try_get(e))
             return *p;
-        throw std::logic_error("get<T> on entity without component");
+        throw std::out_of_range(
+            "acorn::ComponentPool: entity does not have the requested component");
     }
 
     [[nodiscard]] const T& get(Entity e) const
     {
         if (auto* p = try_get(e))
             return *p;
-        throw std::logic_error("get<T> on entity without component");
+        throw std::out_of_range(
+            "acorn::ComponentPool: entity does not have the requested component");
     }
 
     [[nodiscard]] const std::vector<Entity>& entities() const noexcept

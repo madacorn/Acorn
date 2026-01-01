@@ -52,7 +52,11 @@ public:
     {
         const auto key = std::type_index(typeid(T));
         auto it = pools_.find(key);
-        ACORN_ASSERT_MSG(it != pools_.end(), "const pool<T>() called before creation");
+        if (it == pools_.end())
+        {
+            throw std::runtime_error(
+                "ComponentPool requested for type not yet registered in World.");
+        }
         return static_cast<const PoolBox<T>*>(it->second.get())->pool;
     }
 
@@ -85,7 +89,7 @@ public:
     {
         if (auto* p = try_pool<T>())
             return p->get(e);
-        throw std::logic_error("get<T> on entity without pool");
+        throw std::out_of_range("acorn::World: entity does not have the requested pool");
     }
 
     template <typename T>
@@ -93,7 +97,7 @@ public:
     {
         if (const auto* p = try_pool<T>())
             return p->get(e);
-        throw std::logic_error("get<T> on entity without pool");
+        throw std::out_of_range("acorn::World: entity does not have the requested pool");
     }
 
     template <typename T, typename... A>
@@ -113,7 +117,7 @@ public:
     template <typename... Components>
     [[nodiscard]] auto view()
     {
-        return View{pool<Components>()...};
+        return View{(pool<Components>())...};
     }
 
     template <typename... Components>
