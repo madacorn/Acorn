@@ -45,10 +45,9 @@ int main() {
 
     // Iterate through entities with specific components
     auto view = world.view<Position, Velocity>();
-    for (auto e : view) {
-        auto& pos = world.get<Position>(e);
-        auto& vel = world.get<Velocity>(e);
-
+    
+    for (auto [e, pos, vel] : view)
+    {
         pos.x += vel.dx;
         pos.y += vel.dy;
     }
