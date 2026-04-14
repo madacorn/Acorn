@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773766081136,
+  "lastUpdate": 1776199970080,
   "repoUrl": "https://github.com/madacorn/Acorn",
   "entries": {
     "Benchmark": [
@@ -432,6 +432,96 @@ window.BENCHMARK_DATA = {
             "value": 47326.86789263751,
             "unit": "ns/iter",
             "extra": "iterations: 14791\ncpu: 47322.89946589138 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "codingstain@gmail.com",
+            "name": "Alex Mancha",
+            "username": "madacorn"
+          },
+          "committer": {
+            "email": "codingstain@gmail.com",
+            "name": "Alex Mancha",
+            "username": "madacorn"
+          },
+          "distinct": true,
+          "id": "d227bca38505752e5cb1205927ac36e42486923e",
+          "message": "Implementing the each functionality.",
+          "timestamp": "2026-04-14T22:51:56+02:00",
+          "tree_id": "a127f5325bce93bd979489fb14df046f7d62bda2",
+          "url": "https://github.com/madacorn/Acorn/commit/d227bca38505752e5cb1205927ac36e42486923e"
+        },
+        "date": 1776199969362,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_EntityCreation",
+            "value": 1.5581929340659266,
+            "unit": "ns/iter",
+            "extra": "iterations: 435824983\ncpu: 1.5575816405182996 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ComponentAdd",
+            "value": 13.860567378304873,
+            "unit": "ns/iter",
+            "extra": "iterations: 50088838\ncpu: 13.855698349400722 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/1000",
+            "value": 1638.9479524240803,
+            "unit": "ns/iter",
+            "extra": "iterations: 427359\ncpu: 1638.562459197068 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/4096",
+            "value": 6652.076048615879,
+            "unit": "ns/iter",
+            "extra": "iterations: 104328\ncpu: 6651.515767579171 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/10000",
+            "value": 16378.8199379751,
+            "unit": "ns/iter",
+            "extra": "iterations: 42241\ncpu: 16377.581804408037 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/1000",
+            "value": 102.56913442477541,
+            "unit": "ns/iter",
+            "extra": "iterations: 6848983\ncpu: 102.55708300049795 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/4096",
+            "value": 306.20318449639336,
+            "unit": "ns/iter",
+            "extra": "iterations: 2283752\ncpu: 306.1764981486606 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/10000",
+            "value": 711.9755386404339,
+            "unit": "ns/iter",
+            "extra": "iterations: 984655\ncpu: 711.8226993210814 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/1000",
+            "value": 3641.4551118797217,
+            "unit": "ns/iter",
+            "extra": "iterations: 190830\ncpu: 3640.9791594613007 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/4096",
+            "value": 14869.542128130854,
+            "unit": "ns/iter",
+            "extra": "iterations: 46952\ncpu: 14867.296600783779 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/10000",
+            "value": 36242.55525062152,
+            "unit": "ns/iter",
+            "extra": "iterations: 19312\ncpu: 36238.15751864132 ns\nthreads: 1"
           }
         ]
       }
