@@ -52,6 +52,12 @@ public:
         return static_cast<uint32_t>(generations_.size());
     }
 
+    void reset() noexcept
+    {
+        generations_.clear();
+        free_list_.clear();
+    }
+
 private:
     std::vector<uint32_t> generations_;
     std::vector<uint32_t> free_list_;

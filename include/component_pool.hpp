@@ -148,6 +148,13 @@ public:
         return dense_data_.capacity();
     }
 
+    void clear() noexcept
+    {
+        dense_entities_.clear();
+        dense_data_.clear();
+        std::fill(sparse_.begin(), sparse_.end(), kAbsent);
+    }
+
     auto begin() noexcept
     {
         return dense_data_.begin();

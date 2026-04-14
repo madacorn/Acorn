@@ -260,3 +260,22 @@ TEST(WorldTest, MultipleDeferredCommands)
     EXPECT_NO_THROW(world.flush());
     EXPECT_FALSE(world.has<int>(e));
 }
+
+TEST(WorldTest, ClearResetsEverything)
+{
+    acorn::World world;
+    auto e = world.create_entity();
+    world.add<int>(e, 10);
+    world.add<float>(e, 5.0f);
+
+    EXPECT_EQ(world.pool<int>().size(), 1);
+
+    world.clear();
+
+    EXPECT_EQ(world.pool<int>().size(), 0);
+    EXPECT_EQ(world.pool<float>().size(), 0);
+
+    // Verifying EntityManager reset (new entity should get index 0)
+    auto e2 = world.create_entity();
+    EXPECT_EQ(e2.index, 0);
+}

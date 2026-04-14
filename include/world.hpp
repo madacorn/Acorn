@@ -127,6 +127,16 @@ public:
         return View{pool<Components>()...};
     }
 
+    void clear()
+    {
+        for (auto& [_, pool_ptr] : pools_)
+        {
+            pool_ptr->clear();
+        }
+
+        em_.reset();
+    }
+
     template <typename T>
     void defer_remove(Entity e)
     {
@@ -170,6 +180,7 @@ private:
     {
         virtual ~IPool() = default;
         virtual bool remove(Entity e) noexcept = 0;
+        virtual void clear() noexcept = 0;
     };
 
     template <typename T>
@@ -182,6 +193,11 @@ private:
         bool remove(Entity e) noexcept override
         {
             return pool.remove(e);
+        }
+
+        void clear() noexcept override
+        {
+            pool.clear();
         }
     };
 
