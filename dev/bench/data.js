@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1776199970080,
+  "lastUpdate": 1776200536865,
   "repoUrl": "https://github.com/madacorn/Acorn",
   "entries": {
     "Benchmark": [
@@ -522,6 +522,96 @@ window.BENCHMARK_DATA = {
             "value": 36242.55525062152,
             "unit": "ns/iter",
             "extra": "iterations: 19312\ncpu: 36238.15751864132 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "codingstain@gmail.com",
+            "name": "Alex Mancha",
+            "username": "madacorn"
+          },
+          "committer": {
+            "email": "codingstain@gmail.com",
+            "name": "Alex Mancha",
+            "username": "madacorn"
+          },
+          "distinct": true,
+          "id": "0a947e88e063c5859c9f37ddd9d903de4be60328",
+          "message": "Adding the option of defer remove components and defer destroy entities",
+          "timestamp": "2026-04-14T23:01:26+02:00",
+          "tree_id": "5625b9b96f90e7426181d430d55ace5154e27479",
+          "url": "https://github.com/madacorn/Acorn/commit/0a947e88e063c5859c9f37ddd9d903de4be60328"
+        },
+        "date": 1776200536457,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_EntityCreation",
+            "value": 1.8254151804297185,
+            "unit": "ns/iter",
+            "extra": "iterations: 386195708\ncpu: 1.825196874016011 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ComponentAdd",
+            "value": 16.98917746296592,
+            "unit": "ns/iter",
+            "extra": "iterations: 41041301\ncpu: 16.983636361820015 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/1000",
+            "value": 1951.5886630179907,
+            "unit": "ns/iter",
+            "extra": "iterations: 358120\ncpu: 1951.4008265385899 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/4096",
+            "value": 7999.704770610785,
+            "unit": "ns/iter",
+            "extra": "iterations: 87515\ncpu: 7998.994560932413 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/10000",
+            "value": 19797.995964877442,
+            "unit": "ns/iter",
+            "extra": "iterations: 35191\ncpu: 19796.04489784319 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/1000",
+            "value": 128.77044579657522,
+            "unit": "ns/iter",
+            "extra": "iterations: 5453945\ncpu: 128.75691999094244 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/4096",
+            "value": 384.1107001279213,
+            "unit": "ns/iter",
+            "extra": "iterations: 1835436\ncpu: 384.0910987906959 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/10000",
+            "value": 887.8865309745551,
+            "unit": "ns/iter",
+            "extra": "iterations: 790859\ncpu: 887.8412055752036 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/1000",
+            "value": 4796.334195859794,
+            "unit": "ns/iter",
+            "extra": "iterations: 145696\ncpu: 4795.823701405662 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/4096",
+            "value": 19622.200603992795,
+            "unit": "ns/iter",
+            "extra": "iterations: 35762\ncpu: 19620.33957832334 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/10000",
+            "value": 48368.925507285196,
+            "unit": "ns/iter",
+            "extra": "iterations: 14686\ncpu: 48365.06094239411 ns\nthreads: 1"
           }
         ]
       }
