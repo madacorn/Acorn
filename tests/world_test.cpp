@@ -173,3 +173,90 @@ TEST(WorldTest, DestroyEntityCleansUpComponents)
     EXPECT_EQ(w.pool<int>().size(), 0);
     EXPECT_FALSE(w.has<int>(e));
 }
+
+TEST(WorldTest, DeferDestroyWorksOnFlush)
+{
+    World w;
+    Entity e = w.create_entity();
+    w.add<int>(e, 10);
+
+    w.defer_destroy(e);
+
+    EXPECT_TRUE(w.has<int>(e));
+
+    w.flush();
+
+    EXPECT_FALSE(w.has<int>(e));
+}
+
+TEST(WorldTest, DeferOperationsOnlyExecuteOnFlush)
+{
+    acorn::World world;
+    auto e = world.create_entity();
+    world.add<int>(e, 100);
+    world.add<float>(e, 2.0f);
+
+    world.defer_remove<float>(e);
+    world.defer_destroy(e);
+
+    EXPECT_TRUE(world.has<int>(e));
+    EXPECT_TRUE(world.has<float>(e));
+
+    world.flush();
+
+    EXPECT_FALSE(world.has<int>(e));  // Destroyed
+    EXPECT_FALSE(world.has<float>(e));
+}
+
+TEST(WorldTest, DeferDestroyInsideViewEach)
+{
+    acorn::World world;
+
+    for (int i = 0; i < 10; ++i)
+    {
+        auto e = world.create_entity();
+        world.add<int>(e, i);
+    }
+
+    auto view = world.view<int>();
+
+    view.each(
+        [&](acorn::Entity e, int& val)
+        {
+            if (val % 2 == 0)
+            {
+                world.defer_destroy(e);
+            }
+        });
+
+    size_t count_before = 0;
+    for (auto e : world.view<int>())
+    {
+        (void)e;
+        count_before++;
+    }
+    EXPECT_EQ(count_before, 10);
+
+    world.flush();
+
+    size_t count_after = 0;
+    for (auto [e, val] : world.view<int>())
+    {
+        EXPECT_TRUE(val % 2 != 0);
+        count_after++;
+    }
+    EXPECT_EQ(count_after, 5);
+}
+
+TEST(WorldTest, MultipleDeferredCommands)
+{
+    acorn::World world;
+    auto e = world.create_entity();
+    world.add<int>(e, 10);
+
+    world.defer_remove<int>(e);
+    world.defer_destroy(e);
+
+    EXPECT_NO_THROW(world.flush());
+    EXPECT_FALSE(world.has<int>(e));
+}

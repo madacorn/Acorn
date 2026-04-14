@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <memory>
 #include <stdexcept>
 #include <typeindex>
@@ -126,6 +127,26 @@ public:
         return View{pool<Components>()...};
     }
 
+    template <typename T>
+    void defer_remove(Entity e)
+    {
+        commands_.emplace_back([e](World& w) { w.remove<T>(e); });
+    }
+
+    void defer_destroy(Entity e)
+    {
+        commands_.emplace_back([e](World& w) { w.destroy_entity(e); });
+    }
+
+    void flush()
+    {
+        for (auto& cmd : commands_)
+        {
+            cmd(*this);
+        }
+        commands_.clear();
+    }
+
 private:
     template <typename T>
     ComponentPool<T>* try_pool() noexcept
@@ -166,5 +187,6 @@ private:
 
     EntityManager em_;
     std::unordered_map<std::type_index, std::unique_ptr<IPool>> pools_;
+    std::vector<std::function<void(World&)>> commands_;
 };
 }  // namespace acorn
