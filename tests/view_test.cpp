@@ -68,3 +68,32 @@ TEST(ViewTest, MultipleComponentPartialMatch)
     }
     EXPECT_EQ(count, 1);
 }
+
+TEST(ViewTest, EachIterationProvidesCorrectReferences)
+{
+    acorn::World world;
+    auto e1 = world.create_entity();
+    auto e2 = world.create_entity();
+
+    world.add<int>(e1, 10);
+    world.add<float>(e1, 1.0f);
+    
+    // e2 only has int, should be skipped by view<int, float>
+    world.add<int>(e2, 20);
+
+    auto view = world.view<int, float>();
+
+    size_t count = 0;
+    view.each([&](acorn::Entity e, int& i, float& f) {
+        EXPECT_EQ(e, e1);
+        EXPECT_EQ(i, 10);
+        EXPECT_EQ(f, 1.0f);
+        
+        // Verify we can modify the components directly
+        i = 50;
+        count++;
+    });
+
+    EXPECT_EQ(count, 1);
+    EXPECT_EQ(world.get<int>(e1), 50);
+}

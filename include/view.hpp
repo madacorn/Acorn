@@ -39,6 +39,23 @@ public:
         return std::apply([e](auto&... pools) { return (pools.has(e) && ...); }, pools_);
     }
 
+    template <typename Func>
+    void each(Func&& f) const
+    {
+        if (!lead_entities_)
+            return;
+
+        for (Entity e : *lead_entities_)
+        {
+            // contains_all performs the sparse lookups
+            if (contains_all(e))
+            {
+                // Direct application to the function avoids the iterator overhead
+                std::apply([&](auto&... pools) { f(e, pools.get(e)...); }, pools_);
+            }
+        }
+    }
+
     class Iterator
     {
     public:

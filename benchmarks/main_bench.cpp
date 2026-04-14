@@ -51,14 +51,17 @@ static void BM_ViewIteration(benchmark::State& state)
             world.add<Velocity>(e, 0.1f, 0.1f);
         }
     }
+    
+    auto view = world.view<Position, Velocity>();
+
     for (auto _ : state)
     {
-        auto view = world.view<Position, Velocity>();
-        for (auto [e, pos, vel] : view)
-        {
-            pos.x += vel.dx;
-            benchmark::DoNotOptimize(pos);
-        }
+        view.each(
+            [](acorn::Entity e, Position& pos, Velocity& vel)
+            {
+                pos.x += vel.dx;
+                benchmark::DoNotOptimize(pos);
+            });
     }
     state.SetItemsProcessed(state.iterations() * (entity_count / 2));
 }
