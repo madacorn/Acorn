@@ -9,6 +9,7 @@
 #include "component_pool.hpp"
 #include "entity.hpp"
 #include "entity_manager.hpp"
+#include "exclude_view.hpp"
 #include "view.hpp"
 
 namespace acorn
@@ -125,6 +126,25 @@ public:
     [[nodiscard]] const auto view() const
     {
         return View{pool<Components>()...};
+    }
+
+    template <typename... Components, typename... Excluded>
+    [[nodiscard]] auto view_exclude(acorn::Exclude<Excluded...> = {})
+    {
+        return ExcludeView<std::tuple<ComponentPool<Components>...>,
+                           std::tuple<ComponentPool<Excluded>...>>(
+            std::forward_as_tuple(pool<Components>()...),  // include pools
+            std::forward_as_tuple(pool<Excluded>()...)     // exclude pools
+        );
+    }
+
+    template <typename... Components, typename... Excluded>
+    [[nodiscard]] const auto view_exclude(acorn::Exclude<Excluded...> = {}) const
+    {
+        return ExcludeView<std::tuple<const ComponentPool<Components>...>,
+                           std::tuple<const ComponentPool<Excluded>...>>(
+            std::forward_as_tuple(pool<Components>()...),
+            std::forward_as_tuple(pool<Excluded>()...));
     }
 
     void clear()
