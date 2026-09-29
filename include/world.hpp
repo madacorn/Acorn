@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <typeindex>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "acorn_assert.hpp"
 #include "component_pool.hpp"
@@ -22,16 +24,48 @@ public:
         return em_.create();
     }
 
+    using DestroyListener = std::function<void(World&, Entity)>;
+
+    // Registers a listener called whenever an entity is destroyed (by destroy_entity, or by
+    // flush() for defer_destroy). Listeners run in registration order, before the entity's
+    // components are removed, so they can still read them. clear() does not fire listeners.
+    // Must not be called from inside a listener.
+    void on_destroy(DestroyListener listener)
+    {
+        ACORN_ASSERT_MSG(!destroying_, "on_destroy called from inside a destroy listener");
+        destroy_listeners_.push_back(std::move(listener));
+    }
+
+    // Returns false if e is not alive. When called from inside a destroy listener, the
+    // destruction is queued and performed (firing listeners again) after the current entity
+    // is fully destroyed, in call order.
     bool destroy_entity(Entity e)
     {
         if (!em_.is_alive(e))
             return false;
 
-        for (auto& [type, pool_ptr] : pools_)
+        if (destroy_listeners_.empty())
         {
-            pool_ptr->remove(e);
+            remove_entity(e);
+            return true;
         }
-        return em_.destroy(e);
+
+        if (destroying_)
+        {
+            pending_destroys_.push_back(e);
+            return true;
+        }
+
+        DestroyScope scope{*this};
+        notify_and_remove(e);
+        // Index loop: listeners may queue more destructions while we drain.
+        for (size_t i = 0; i < pending_destroys_.size(); ++i)
+        {
+            const Entity pending = pending_destroys_[i];
+            if (em_.is_alive(pending))
+                notify_and_remove(pending);
+        }
+        return true;
     }
 
     [[nodiscard]] bool is_alive(Entity e) const noexcept
@@ -153,8 +187,10 @@ public:
             std::forward_as_tuple(pool_or_empty<Excluded>()...));
     }
 
+    // Bulk reset: removes every entity and component without firing destroy listeners.
     void clear()
     {
+        ACORN_ASSERT_MSG(!destroying_, "clear called from inside a destroy listener");
         for (auto& [_, pool_ptr] : pools_)
         {
             pool_ptr->clear();
@@ -174,16 +210,55 @@ public:
         commands_.emplace_back([e](World& w) { w.destroy_entity(e); });
     }
 
+    // Commands deferred while flushing (e.g. by destroy listeners) run in the same flush.
     void flush()
     {
-        for (auto& cmd : commands_)
+        while (!commands_.empty())
         {
-            cmd(*this);
+            auto batch = std::move(commands_);
+            commands_.clear();
+            for (auto& cmd : batch)
+            {
+                cmd(*this);
+            }
         }
-        commands_.clear();
     }
 
 private:
+    void remove_entity(Entity e)
+    {
+        for (auto& [type, pool_ptr] : pools_)
+        {
+            pool_ptr->remove(e);
+        }
+        em_.destroy(e);
+    }
+
+    void notify_and_remove(Entity e)
+    {
+        for (auto& listener : destroy_listeners_)
+        {
+            listener(*this, e);
+        }
+        remove_entity(e);
+    }
+
+    struct DestroyScope
+    {
+        World& w;
+
+        explicit DestroyScope(World& world) : w(world)
+        {
+            w.destroying_ = true;
+        }
+
+        ~DestroyScope()
+        {
+            w.pending_destroys_.clear();
+            w.destroying_ = false;
+        }
+    };
+
     template <typename T>
     ComponentPool<T>* try_pool() noexcept
     {
@@ -242,5 +317,8 @@ private:
     EntityManager em_;
     std::unordered_map<std::type_index, std::unique_ptr<IPool>> pools_;
     std::vector<std::function<void(World&)>> commands_;
+    std::vector<DestroyListener> destroy_listeners_;
+    std::vector<Entity> pending_destroys_;
+    bool destroying_ = false;
 };
 }  // namespace acorn

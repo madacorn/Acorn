@@ -70,7 +70,27 @@ int main() {
 | `view<Ts...>()` | Iterates entities that have all of `Ts`. On a `const World`, a component type that was never used yields an empty view. |
 | `view_exclude<Ts...>(Exclude<Us...>{})` | Like `view`, skipping entities that have any of `Us`. |
 | `defer_remove<T>(e)` / `defer_destroy(e)` / `flush()` | Queue structural changes and apply them later. |
-| `clear()` | Removes all entities and components. |
+| `on_destroy(fn)` | Registers a `void(World&, Entity)` listener fired when an entity is destroyed. See [Destroy events](#destroy-events). |
+| `clear()` | Removes all entities and components. Does not fire destroy listeners. |
+
+### Destroy events
+
+Components often store handles to other entities (a reservation's holder, a task's target). Register a listener to clean those up when the referenced entity dies:
+
+```cpp
+world.on_destroy([](acorn::World& w, acorn::Entity dying) {
+    for (auto [e, r] : w.view<Reservation>())
+        if (r.holder == dying)
+            r.holder = acorn::Entity::null();
+});
+```
+
+* Listeners fire inside `destroy_entity` and inside `flush()` for `defer_destroy`, in registration order.
+* They run **before** the entity's components are removed, so `get`/`try_get` on the dying entity still work.
+* Calling `destroy_entity` from a listener is safe: the destruction is queued and runs (firing listeners) after the current entity is fully destroyed, in call order. `defer_*` calls made during `flush()` run in the same flush.
+* Registering listeners or calling `clear()` from inside a listener is not allowed (asserted in debug builds).
+* `clear()` is a bulk reset and does **not** fire listeners.
+* With no listeners registered, `destroy_entity` only pays an empty-vector check.
 
 ## Core Components
 * **World**: The central container managing the EntityManager and ComponentPools.
