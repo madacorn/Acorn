@@ -5,7 +5,7 @@ A simple, high-performance C++20 Entity Component System (ECS) library focused o
 ## Features
 
 * **Fast Component Iteration**: Uses a sparse set-based design for cache-friendly, contiguous component storage.
-* **Generational Handles**: Safe entity identifiers that prevent "ABA" problems by tracking reuse through generation increments.
+* **Generational Handles**: Safe entity identifiers that prevent "ABA" problems by tracking reuse through generation increments. Generations are 31-bit and wrap after 2³¹ reuses of the same slot.
 * **Minimal API**: Clean and intuitive interface for managing entities and components without heavy boilerplate.
 * **Performance First**: Integrated with Google Benchmark and GitHub Actions to ensure every commit is measured against a baseline.
 

@@ -228,12 +228,36 @@ TEST(SerializationTest, ImportRejectsMalformedState)
     EXPECT_THROW(w.import_entities(EntityState{{1, 1}, {0, 0}}), std::invalid_argument);
 }
 
+TEST(SerializationTest, ImportRejectsGenerationUsingFreeBit)
+{
+    World w;
+    EXPECT_THROW(w.import_entities(EntityState{{EntityManager::kFreeBit}, {}}),
+                 std::invalid_argument);
+}
+
+TEST(SerializationTest, FreeSlotsStayDeadAfterImport)
+{
+    World w;
+    w.import_entities(EntityState{{0, 1}, {1}});
+
+    EXPECT_TRUE(w.is_alive(Entity{0, 0}));
+    EXPECT_FALSE(w.is_alive(Entity{1, 0}));
+    EXPECT_FALSE(w.is_alive(Entity{1, 1}));
+
+    const auto state = w.export_entities();
+    EXPECT_EQ(state.generations, (std::vector<uint32_t>{0, 1}));
+    EXPECT_EQ(state.free_list, (std::vector<uint32_t>{1}));
+
+    EXPECT_EQ(w.create_entity(), (Entity{1, 1}));
+}
+
 TEST(SerializationTest, RestoreComponentRejectsDeadOrDuplicate)
 {
     World w;
     w.import_entities(EntityState{{0, 1}, {1}});
 
     EXPECT_THROW(w.restore_component<Name>(Entity{1, 0}, Name{}), std::logic_error);
+    EXPECT_THROW(w.restore_component<Name>(Entity{1, 1}, Name{}), std::logic_error);
     w.restore_component<Name>(Entity{0, 0}, Name{1});
     EXPECT_THROW(w.restore_component<Name>(Entity{0, 0}, Name{2}), std::logic_error);
     EXPECT_EQ(w.get<Name>(Entity{0, 0}).id, 1);

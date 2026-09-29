@@ -67,3 +67,48 @@ TEST(EntityManagerTest, CapacityDoesNotGrowWhenReusing)
     EXPECT_TRUE(em.is_alive(e2));
     EXPECT_TRUE(em.is_alive(e3));
 }
+
+TEST(EntityManagerTest, HandleWithCurrentGenerationOfFreeSlotIsNotAlive)
+{
+    acorn::EntityManager em;
+    acorn::Entity e = em.create();
+    ASSERT_TRUE(em.destroy(e));
+
+    // Handle the slot will hand out next: must not be alive until create() issues it.
+    acorn::Entity next{e.index, e.generation + 1};
+    EXPECT_FALSE(em.is_alive(next));
+    EXPECT_FALSE(em.destroy(next));
+
+    acorn::Entity reused = em.create();
+    EXPECT_EQ(reused, next);
+    EXPECT_TRUE(em.is_alive(reused));
+}
+
+TEST(EntityManagerTest, NoHandleToFreeSlotIsAlive)
+{
+    acorn::EntityManager em;
+    acorn::Entity e = em.create();
+    ASSERT_TRUE(em.destroy(e));
+
+    for (uint32_t gen : {0u, 1u, 2u, acorn::EntityManager::kFreeBit,
+                         acorn::EntityManager::kFreeBit | 1u, UINT32_MAX})
+    {
+        EXPECT_FALSE(em.is_alive(acorn::Entity{e.index, gen})) << gen;
+    }
+}
+
+TEST(EntityManagerTest, GenerationWrapsWithin31Bits)
+{
+    acorn::EntityManager em;
+    acorn::EntityState state{{acorn::EntityManager::kGenerationMask}, {}};
+    em.import_state(state);
+
+    acorn::Entity e{0, acorn::EntityManager::kGenerationMask};
+    ASSERT_TRUE(em.is_alive(e));
+    ASSERT_TRUE(em.destroy(e));
+
+    acorn::Entity reused = em.create();
+    EXPECT_EQ(reused.generation, 0u);
+    EXPECT_TRUE(em.is_alive(reused));
+    EXPECT_FALSE(em.is_alive(e));
+}
