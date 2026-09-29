@@ -13,7 +13,7 @@ template <typename T>
 class ComponentPool
 {
 public:
-    explicit ComponentPool(const EntityManager& em, size_t reserve_hint = 0) noexcept : em_(em)
+    explicit ComponentPool(const EntityManager& em, size_t reserve_hint = 0) noexcept : em_(&em)
     {
         if (reserve_hint)
         {
@@ -25,7 +25,7 @@ public:
 
     bool has(Entity e) const noexcept
     {
-        if (!em_.is_alive(e))
+        if (!em_->is_alive(e))
             return false;
         if (e.index >= sparse_.size())
             return false;
@@ -68,6 +68,12 @@ public:
             "acorn::ComponentPool: entity does not have the requested component");
     }
 
+    // Points the pool at another EntityManager, e.g. after its World was moved.
+    void rebind(const EntityManager& em) noexcept
+    {
+        em_ = &em;
+    }
+
     [[nodiscard]] const std::vector<Entity>& entities() const noexcept
     {
         return dense_entities_;
@@ -76,7 +82,7 @@ public:
     template <typename... Args>
     T& emplace(Entity e, Args&&... args)
     {
-        ACORN_ASSERT(em_.is_alive(e));
+        ACORN_ASSERT(em_->is_alive(e));
 
         grow_sparse_to_fit(e.index);
 
@@ -198,7 +204,7 @@ private:
             const Entity e = dense_entities_[i];
 
             // Must be alive
-            ACORN_ASSERT(em_.is_alive(e));
+            ACORN_ASSERT(em_->is_alive(e));
 
             // No index bigger than the size
             ACORN_ASSERT(e.index < sparse_.size());
@@ -227,7 +233,7 @@ private:
         }
     }
 
-    const EntityManager& em_;
+    const EntityManager* em_;
 
     std::vector<Entity> dense_entities_;
     std::vector<T> dense_data_;

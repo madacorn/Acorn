@@ -74,6 +74,7 @@ int main() {
 | `each_in_order<T>(fn)` / `restore_component<T>(e, c)` | Read a pool in dense (iteration) order and rebuild it in that order. |
 | `on_destroy(fn)` | Registers a `void(World&, Entity)` listener fired when an entity is destroyed. See [Destroy events](#destroy-events). |
 | `clear()` | Removes all entities and components. Does not fire destroy listeners. |
+| Move construct / assign | Transfers entities, components, pending commands and listeners (e.g. to swap in a loaded world). The moved-from world is left empty and usable. Copying is deleted. |
 
 ### Destroy events
 
@@ -92,6 +93,8 @@ world.on_destroy([](acorn::World& w, acorn::Entity dying) {
 * Calling `destroy_entity` from a listener is safe: the destruction is queued and runs (firing listeners) after the current entity is fully destroyed, in call order. `defer_*` calls made during `flush()` run in the same flush.
 * Registering listeners or calling `clear()` from inside a listener is not allowed (asserted in debug builds).
 * `clear()` is a bulk reset and does **not** fire listeners.
+* Listeners move with the `World`. Use the `World&` parameter rather than capturing a world by reference, since a captured reference keeps pointing at the moved-from world.
+* Moving a `World` from inside a listener or during `flush()` is not allowed (asserted in debug builds).
 * With no listeners registered, `destroy_entity` only pays an empty-vector check.
 
 ### Save and load

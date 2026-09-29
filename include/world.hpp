@@ -19,6 +19,42 @@ namespace acorn
 class World
 {
 public:
+    World() = default;
+    World(const World&) = delete;
+    World& operator=(const World&) = delete;
+
+    // Moves transfer entities, components, pending commands and destroy listeners, and rebind
+    // every pool to the destination's EntityManager. The moved-from world is left empty and
+    // fully usable. Must not be called from inside a destroy listener or during flush().
+    // Listeners that captured the source world by reference still point at it.
+    World(World&& other) noexcept
+        : em_(std::move(other.em_)),
+          pools_(std::move(other.pools_)),
+          commands_(std::move(other.commands_)),
+          destroy_listeners_(std::move(other.destroy_listeners_))
+    {
+        ACORN_ASSERT_MSG(!other.destroying_ && !other.flushing_,
+                         "World moved from inside a destroy listener or flush()");
+        other.reset_after_move();
+        rebind_pools();
+    }
+
+    World& operator=(World&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
+
+        ACORN_ASSERT_MSG(!destroying_ && !flushing_ && !other.destroying_ && !other.flushing_,
+                         "World moved from inside a destroy listener or flush()");
+        em_ = std::move(other.em_);
+        pools_ = std::move(other.pools_);
+        commands_ = std::move(other.commands_);
+        destroy_listeners_ = std::move(other.destroy_listeners_);
+        other.reset_after_move();
+        rebind_pools();
+        return *this;
+    }
+
     Entity create_entity()
     {
         return em_.create();
@@ -266,6 +302,7 @@ public:
     // Commands deferred while flushing (e.g. by destroy listeners) run in the same flush.
     void flush()
     {
+        FlushScope scope{*this};
         while (!commands_.empty())
         {
             auto batch = std::move(commands_);
@@ -294,6 +331,39 @@ private:
             listener(*this, e);
         }
         remove_entity(e);
+    }
+
+    struct FlushScope
+    {
+        World& w;
+        bool previous;
+
+        explicit FlushScope(World& world) : w(world), previous(world.flushing_)
+        {
+            w.flushing_ = true;
+        }
+
+        ~FlushScope()
+        {
+            w.flushing_ = previous;
+        }
+    };
+
+    void rebind_pools() noexcept
+    {
+        for (auto& [_, pool_ptr] : pools_)
+        {
+            pool_ptr->rebind(em_);
+        }
+    }
+
+    void reset_after_move() noexcept
+    {
+        em_.reset();
+        pools_.clear();
+        commands_.clear();
+        destroy_listeners_.clear();
+        pending_destroys_.clear();
     }
 
     struct DestroyScope
@@ -336,6 +406,7 @@ private:
         virtual bool remove(Entity e) noexcept = 0;
         virtual void clear() noexcept = 0;
         virtual size_t size() const noexcept = 0;
+        virtual void rebind(const EntityManager& em) noexcept = 0;
     };
 
     template <typename T>
@@ -359,6 +430,11 @@ private:
         {
             return pool.size();
         }
+
+        void rebind(const EntityManager& em) noexcept override
+        {
+            pool.rebind(em);
+        }
     };
 
     EntityManager em_;
@@ -367,5 +443,6 @@ private:
     std::vector<DestroyListener> destroy_listeners_;
     std::vector<Entity> pending_destroys_;
     bool destroying_ = false;
+    bool flushing_ = false;
 };
 }  // namespace acorn
