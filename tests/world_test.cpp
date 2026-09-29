@@ -394,3 +394,21 @@ TEST(WorldTest, IsAliveFalseForNull)
     (void)w.create_entity();
     EXPECT_FALSE(w.is_alive(Entity::null()));
 }
+
+TEST(WorldTest, StaleHandleDoesNotSeeComponentsOfReusedSlot)
+{
+    World w;
+    Entity old_e = w.create_entity();
+    w.add<CompA>(old_e, CompA{1});
+    ASSERT_TRUE(w.destroy_entity(old_e));
+
+    Entity new_e = w.create_entity();
+    ASSERT_EQ(new_e.index, old_e.index);
+    EXPECT_FALSE(w.has<CompA>(new_e));
+
+    w.add<CompA>(new_e, CompA{2});
+    EXPECT_FALSE(w.has<CompA>(old_e));
+    EXPECT_EQ(w.try_get<CompA>(old_e), nullptr);
+    EXPECT_FALSE(w.remove<CompA>(old_e));
+    EXPECT_EQ(w.get<CompA>(new_e).x, 2);
+}

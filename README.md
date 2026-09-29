@@ -131,7 +131,7 @@ for (const auto& row : j["Position"]) {                // same order as saved
 
 * **EntityManager**: Handles entity allocation, destruction, and generational tracking.
 
-* **ComponentPool**: Implements a sparse set to store component data contiguously in memory.
+* **ComponentPool**: Implements a sparse set to store component data contiguously in memory. It does not depend on the EntityManager: a handle matches only if both index and generation equal the stored entity, and `World` removes an entity's components when it is destroyed.
 
 * **View**: Provides an efficient way to iterate over entities that possess a specific set of components.
 

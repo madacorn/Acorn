@@ -10,7 +10,7 @@
 TEST(ComponentPoolTest, HasOnEmptyIsFalse)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     auto e = em.create();
     EXPECT_FALSE(pool.has(e));
@@ -19,7 +19,7 @@ TEST(ComponentPoolTest, HasOnEmptyIsFalse)
 TEST(ComponentPoolTest, TryGetReturnsNullWhenAbsent)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
     auto e = em.create();
     EXPECT_EQ(pool.try_get(e), nullptr);
 }
@@ -27,7 +27,7 @@ TEST(ComponentPoolTest, TryGetReturnsNullWhenAbsent)
 TEST(ComponentPoolTest, EmplaceThenHasAndTryGet)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     auto e = em.create();
     pool.emplace(e, 42);
@@ -40,7 +40,7 @@ TEST(ComponentPoolTest, EmplaceThenHasAndTryGet)
 TEST(ComponentPoolTest, DuplicateEmplaceOverwrites)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     auto e = em.create();
     pool.emplace(e, 1);
@@ -51,7 +51,7 @@ TEST(ComponentPoolTest, DuplicateEmplaceOverwrites)
 TEST(ComponentPoolTest, EmplaceLargeIndexGrowsSparse)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     std::vector<acorn::Entity> v;
     for (int i = 0; i < 1000; ++i) v.push_back(em.create());
@@ -63,7 +63,7 @@ TEST(ComponentPoolTest, EmplaceLargeIndexGrowsSparse)
 TEST(ComponentPoolTest, RemoveExistingClearsHasAndShrinks)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     auto e = em.create();
     pool.emplace(e, 5);
@@ -78,7 +78,7 @@ TEST(ComponentPoolTest, RemoveExistingClearsHasAndShrinks)
 TEST(ComponentPoolTest, RemoveMiddleSwapRemoveUpdatesSparse)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     auto e0 = em.create();
     auto e1 = em.create();
@@ -100,7 +100,7 @@ TEST(ComponentPoolTest, RemoveMiddleSwapRemoveUpdatesSparse)
 TEST(ComponentPoolTest, RemoveLastFastPath)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     auto a = em.create();
     auto b = em.create();
@@ -117,7 +117,7 @@ TEST(ComponentPoolTest, RemoveLastFastPath)
 TEST(ComponentPoolTest, RemoveAbsentReturnsFalse)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     auto e = em.create();
     EXPECT_FALSE(pool.remove(e));
@@ -129,7 +129,7 @@ TEST(ComponentPoolTest, RemoveAbsentReturnsFalse)
 TEST(ComponentPoolTest, IterateVisitsAll)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     auto a = em.create();
     auto b = em.create();
@@ -147,24 +147,35 @@ TEST(ComponentPoolTest, IterateVisitsAll)
     EXPECT_EQ(sum, 7);
 }
 
-TEST(ComponentPoolTest, HasRespectsGenerationAfterDestroy)
+TEST(ComponentPoolTest, HasRequiresMatchingGeneration)
 {
-    acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
-    auto e = em.create();
+    acorn::Entity e{3, 2};
     pool.emplace(e, 5);
     ASSERT_TRUE(pool.has(e));
 
-    EXPECT_TRUE(em.destroy(e));
-    EXPECT_FALSE(pool.has(e));
-    EXPECT_EQ(pool.try_get(e), nullptr);
+    // Same slot, other generations (stale or not yet issued handles) do not match.
+    EXPECT_FALSE(pool.has(acorn::Entity{3, 1}));
+    EXPECT_FALSE(pool.has(acorn::Entity{3, 3}));
+    EXPECT_EQ(pool.try_get(acorn::Entity{3, 1}), nullptr);
+    EXPECT_FALSE(pool.remove(acorn::Entity{3, 1}));
+    EXPECT_TRUE(pool.has(e));
+}
+
+TEST(ComponentPoolTest, NullEntityNeverMatches)
+{
+    acorn::ComponentPool<int> pool;
+    pool.emplace(acorn::Entity{0, 0}, 1);
+
+    EXPECT_FALSE(pool.has(acorn::Entity::null()));
+    EXPECT_EQ(pool.try_get(acorn::Entity::null()), nullptr);
 }
 
 TEST(ComponentPoolTest, GetReturnsReference)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
     auto e = em.create();
     pool.emplace(e, 5);
     int& ref = pool.get(e);
@@ -175,7 +186,7 @@ TEST(ComponentPoolTest, GetReturnsReference)
 TEST(ComponentPoolTest, ConstTryGetAndGet)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
     auto e = em.create();
     pool.emplace(e, 11);
 
@@ -189,7 +200,7 @@ TEST(ComponentPoolTest, ConstTryGetAndGet)
 TEST(ComponentPoolTest, GetAbsentThrows)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
     auto e = em.create();
 
     EXPECT_THROW((void)pool.get(e), std::out_of_range);
@@ -198,7 +209,7 @@ TEST(ComponentPoolTest, GetAbsentThrows)
 TEST(ComponentPoolTest, ReAddAfterRemoveWorks)
 {
     acorn::EntityManager em;
-    acorn::ComponentPool<int> pool(em);
+    acorn::ComponentPool<int> pool;
 
     auto e = em.create();
     pool.emplace(e, 5);

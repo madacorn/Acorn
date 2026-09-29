@@ -5,15 +5,18 @@
 #include <vector>
 
 #include "acorn_assert.hpp"
-#include "entity_manager.hpp"
+#include "entity.hpp"
 
 namespace acorn
 {
+// Sparse set of T keyed by Entity. The pool does not track entity liveness: a handle matches only
+// if its index and generation equal the stored entity, so the owner (World) must remove an
+// entity's components when it destroys it.
 template <typename T>
 class ComponentPool
 {
 public:
-    explicit ComponentPool(const EntityManager& em, size_t reserve_hint = 0) noexcept : em_(&em)
+    explicit ComponentPool(size_t reserve_hint = 0) noexcept
     {
         if (reserve_hint)
         {
@@ -25,8 +28,6 @@ public:
 
     bool has(Entity e) const noexcept
     {
-        if (!em_->is_alive(e))
-            return false;
         if (e.index >= sparse_.size())
             return false;
 
@@ -68,12 +69,6 @@ public:
             "acorn::ComponentPool: entity does not have the requested component");
     }
 
-    // Points the pool at another EntityManager, e.g. after its World was moved.
-    void rebind(const EntityManager& em) noexcept
-    {
-        em_ = &em;
-    }
-
     [[nodiscard]] const std::vector<Entity>& entities() const noexcept
     {
         return dense_entities_;
@@ -82,9 +77,11 @@ public:
     template <typename... Args>
     T& emplace(Entity e, Args&&... args)
     {
-        ACORN_ASSERT(em_->is_alive(e));
-
         grow_sparse_to_fit(e.index);
+
+        // A different generation in this slot means e is a stale handle.
+        ACORN_ASSERT_MSG(sparse_[e.index] == kAbsent || dense_entities_[sparse_[e.index]] == e,
+                         "emplace with a stale entity handle");
 
         // Overwrite policy, if the entity already has the component we overwrite it
         if (has(e))
@@ -203,9 +200,6 @@ private:
         {
             const Entity e = dense_entities_[i];
 
-            // Must be alive
-            ACORN_ASSERT(em_->is_alive(e));
-
             // No index bigger than the size
             ACORN_ASSERT(e.index < sparse_.size());
 
@@ -232,8 +226,6 @@ private:
             sparse_.resize(index + 1, kAbsent);
         }
     }
-
-    const EntityManager* em_;
 
     std::vector<Entity> dense_entities_;
     std::vector<T> dense_data_;

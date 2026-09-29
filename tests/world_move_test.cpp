@@ -96,7 +96,7 @@ void expect_world_intact(World& w, const Fixture& f)
     cw.view<Pos, Vel>().each([&](Entity, const Pos&, const Vel&) { ++const_count; });
     EXPECT_EQ(const_count, 2u);
 
-    // Adding still works (emplace asserts liveness against the pool's manager).
+    // Adding still works (add asserts liveness against the world's manager).
     w.add<Vel>(f.still, Vel{30});
     EXPECT_EQ(w.get<Vel>(f.still).dx, 30);
 }

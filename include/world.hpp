@@ -23,10 +23,10 @@ public:
     World(const World&) = delete;
     World& operator=(const World&) = delete;
 
-    // Moves transfer entities, components, pending commands and destroy listeners, and rebind
-    // every pool to the destination's EntityManager. The moved-from world is left empty and
-    // fully usable. Must not be called from inside a destroy listener or during flush().
-    // Listeners that captured the source world by reference still point at it.
+    // Moves transfer entities, components, pending commands and destroy listeners. The
+    // moved-from world is left empty and fully usable. Must not be called from inside a destroy
+    // listener or during flush(). Listeners that captured the source world by reference still point
+    // at it.
     World(World&& other) noexcept
         : em_(std::move(other.em_)),
           pools_(std::move(other.pools_)),
@@ -36,7 +36,6 @@ public:
         ACORN_ASSERT_MSG(!other.destroying_ && !other.flushing_,
                          "World moved from inside a destroy listener or flush()");
         other.reset_after_move();
-        rebind_pools();
     }
 
     World& operator=(World&& other) noexcept
@@ -51,7 +50,6 @@ public:
         commands_ = std::move(other.commands_);
         destroy_listeners_ = std::move(other.destroy_listeners_);
         other.reset_after_move();
-        rebind_pools();
         return *this;
     }
 
@@ -116,7 +114,7 @@ public:
         auto it = pools_.find(key);
         if (it == pools_.end())
         {
-            auto box = std::make_unique<PoolBox<T>>(em_);
+            auto box = std::make_unique<PoolBox<T>>();
             auto* out = &box->pool;
             pools_.emplace(key, std::move(box));
             return *out;
@@ -131,8 +129,7 @@ public:
         if (const auto* p = try_pool<T>())
             return *p;
 
-        static const EntityManager empty_em;
-        static const ComponentPool<T> empty_pool(empty_em);
+        static const ComponentPool<T> empty_pool;
         return empty_pool;
     }
 
@@ -179,6 +176,7 @@ public:
     template <typename T, typename... A>
     T& add(Entity e, A&&... args)
     {
+        ACORN_ASSERT_MSG(em_.is_alive(e), "add on an entity that is not alive");
         return pool<T>().emplace(e, std::forward<A>(args)...);
     }
 
@@ -349,14 +347,6 @@ private:
         }
     };
 
-    void rebind_pools() noexcept
-    {
-        for (auto& [_, pool_ptr] : pools_)
-        {
-            pool_ptr->rebind(em_);
-        }
-    }
-
     void reset_after_move() noexcept
     {
         em_.reset();
@@ -406,15 +396,12 @@ private:
         virtual bool remove(Entity e) noexcept = 0;
         virtual void clear() noexcept = 0;
         virtual size_t size() const noexcept = 0;
-        virtual void rebind(const EntityManager& em) noexcept = 0;
     };
 
     template <typename T>
     struct PoolBox final : IPool
     {
         ComponentPool<T> pool;
-
-        explicit PoolBox(const EntityManager& em) : pool(em) {}
 
         bool remove(Entity e) noexcept override
         {
@@ -429,11 +416,6 @@ private:
         size_t size() const noexcept override
         {
             return pool.size();
-        }
-
-        void rebind(const EntityManager& em) noexcept override
-        {
-            pool.rebind(em);
         }
     };
 
