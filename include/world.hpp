@@ -199,6 +199,60 @@ public:
         em_.reset();
     }
 
+    // --- Serialization hooks -------------------------------------------------------------
+    // Save: export_entities(), then each_in_order<T>() for every component type.
+    // Load: on an empty (fresh or cleared) world, import_entities(), then restore_component<T>()
+    // in the same order. Views then iterate in the same order and create_entity() returns the
+    // same next handle as on the original world. flush() pending commands before saving.
+
+    [[nodiscard]] EntityState export_entities() const
+    {
+        return em_.export_state();
+    }
+
+    // Throws std::logic_error if the world has any entity slots or components (call clear()
+    // first), and std::invalid_argument if the state is malformed.
+    void import_entities(const EntityState& state)
+    {
+        if (em_.capacity() != 0)
+            throw std::logic_error("acorn::World::import_entities: world is not empty");
+        for (const auto& [_, pool_ptr] : pools_)
+        {
+            if (pool_ptr->size() != 0)
+                throw std::logic_error("acorn::World::import_entities: world is not empty");
+        }
+        em_.import_state(state);
+    }
+
+    // Visits every T in dense (iteration) order as fn(Entity, const T&).
+    template <typename T, typename Func>
+    void each_in_order(Func&& fn) const
+    {
+        const auto* p = try_pool<T>();
+        if (!p)
+            return;
+
+        const auto& entities = p->entities();
+        auto it = p->begin();
+        for (size_t i = 0; i < entities.size(); ++i, ++it)
+        {
+            fn(entities[i], *it);
+        }
+    }
+
+    // Appends component T for e, so calls in each_in_order<T>() order rebuild the same dense
+    // order. Throws std::logic_error if e is not alive or already has T.
+    template <typename T>
+    T& restore_component(Entity e, T component)
+    {
+        if (!em_.is_alive(e))
+            throw std::logic_error("acorn::World::restore_component: entity is not alive");
+        auto& p = pool<T>();
+        if (p.has(e))
+            throw std::logic_error("acorn::World::restore_component: entity already has component");
+        return p.emplace(e, std::move(component));
+    }
+
     template <typename T>
     void defer_remove(Entity e)
     {
@@ -294,6 +348,7 @@ private:
         virtual ~IPool() = default;
         virtual bool remove(Entity e) noexcept = 0;
         virtual void clear() noexcept = 0;
+        virtual size_t size() const noexcept = 0;
     };
 
     template <typename T>
@@ -311,6 +366,11 @@ private:
         void clear() noexcept override
         {
             pool.clear();
+        }
+
+        size_t size() const noexcept override
+        {
+            return pool.size();
         }
     };
 

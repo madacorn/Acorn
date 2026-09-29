@@ -70,6 +70,8 @@ int main() {
 | `view<Ts...>()` | Iterates entities that have all of `Ts`. On a `const World`, a component type that was never used yields an empty view. |
 | `view_exclude<Ts...>(Exclude<Us...>{})` | Like `view`, skipping entities that have any of `Us`. |
 | `defer_remove<T>(e)` / `defer_destroy(e)` / `flush()` | Queue structural changes and apply them later. |
+| `export_entities()` / `import_entities(state)` | Snapshot and restore the exact entity manager state. See [Save and load](#save-and-load). |
+| `each_in_order<T>(fn)` / `restore_component<T>(e, c)` | Read a pool in dense (iteration) order and rebuild it in that order. |
 | `on_destroy(fn)` | Registers a `void(World&, Entity)` listener fired when an entity is destroyed. See [Destroy events](#destroy-events). |
 | `clear()` | Removes all entities and components. Does not fire destroy listeners. |
 
@@ -91,6 +93,35 @@ world.on_destroy([](acorn::World& w, acorn::Entity dying) {
 * Registering listeners or calling `clear()` from inside a listener is not allowed (asserted in debug builds).
 * `clear()` is a bulk reset and does **not** fire listeners.
 * With no listeners registered, `destroy_entity` only pays an empty-vector check.
+
+### Save and load
+
+Acorn does not pick a file format; it exposes hooks so a save reloads **identically**: same handles and generations (so `Entity` handles stored in components stay valid), same free-list order (so the next `create_entity()` returns the same handle), and the same iteration order for every view.
+
+```cpp
+// Save
+world.flush();                                        // apply pending deferred commands
+acorn::EntityState state = world.export_entities();   // { generations, free_list }
+json j;
+j["generations"] = state.generations;
+j["free_list"] = state.free_list;
+world.each_in_order<Position>([&](acorn::Entity e, const Position& p) {
+    j["Position"].push_back({e.index, e.generation, p.x, p.y});
+});
+
+// Load (on a fresh World, or after world.clear())
+acorn::EntityState loaded{j["generations"].get<std::vector<uint32_t>>(),
+                          j["free_list"].get<std::vector<uint32_t>>()};
+world.import_entities(loaded);
+for (const auto& row : j["Position"]) {                // same order as saved
+    acorn::Entity e{row[0].get<uint32_t>(), row[1].get<uint32_t>()};
+    world.restore_component<Position>(e, Position{row[2].get<float>(), row[3].get<float>()});
+}
+```
+
+* `import_entities` throws `std::logic_error` if the world has any entity slots or components (call `clear()` first) and `std::invalid_argument` for a malformed free list.
+* `restore_component` appends in call order and throws `std::logic_error` if the entity is not alive or already has the component.
+* Restore every component type you saved, each in the order `each_in_order` produced it.
 
 ## Core Components
 * **World**: The central container managing the EntityManager and ComponentPools.

@@ -1,10 +1,20 @@
 #pragma once
+#include <cstdint>
+#include <stdexcept>
 #include <vector>
 
 #include "entity.hpp"
 
 namespace acorn
 {
+// Exact snapshot of the entity manager, for save/load. An index is alive when it is present in
+// generations and not in free_list. free_list order matters: create() reuses from its back.
+struct EntityState
+{
+    std::vector<uint32_t> generations;
+    std::vector<uint32_t> free_list;
+};
+
 class EntityManager
 {
 public:
@@ -56,6 +66,27 @@ public:
     {
         generations_.clear();
         free_list_.clear();
+    }
+
+    [[nodiscard]] EntityState export_state() const
+    {
+        return EntityState{generations_, free_list_};
+    }
+
+    // Throws std::invalid_argument if a free-list index is out of range or duplicated.
+    void import_state(const EntityState& state)
+    {
+        std::vector<bool> seen(state.generations.size(), false);
+        for (uint32_t idx : state.free_list)
+        {
+            if (idx >= state.generations.size() || seen[idx])
+                throw std::invalid_argument(
+                    "acorn::EntityManager: invalid free list in EntityState");
+            seen[idx] = true;
+        }
+
+        generations_ = state.generations;
+        free_list_ = state.free_list;
     }
 
 private:
