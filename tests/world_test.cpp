@@ -342,3 +342,39 @@ TEST(WorldTest, ConstViewExcludeOfUnregisteredComponentExcludesNothing)
     EXPECT_NO_THROW(iterate());
     EXPECT_EQ(seen, created);
 }
+
+TEST(WorldTest, IsAliveAfterCreate)
+{
+    World w;
+    Entity e = w.create_entity();
+    EXPECT_TRUE(w.is_alive(e));
+}
+
+TEST(WorldTest, IsAliveFalseAfterDestroy)
+{
+    World w;
+    Entity e = w.create_entity();
+    ASSERT_TRUE(w.destroy_entity(e));
+    EXPECT_FALSE(w.is_alive(e));
+}
+
+TEST(WorldTest, IsAliveFalseForStaleHandleAfterSlotReuse)
+{
+    World w;
+    Entity old_e = w.create_entity();
+    ASSERT_TRUE(w.destroy_entity(old_e));
+
+    Entity new_e = w.create_entity();
+    ASSERT_EQ(new_e.index, old_e.index);
+    ASSERT_NE(new_e.generation, old_e.generation);
+
+    EXPECT_FALSE(w.is_alive(old_e));
+    EXPECT_TRUE(w.is_alive(new_e));
+}
+
+TEST(WorldTest, IsAliveFalseForNull)
+{
+    World w;
+    (void)w.create_entity();
+    EXPECT_FALSE(w.is_alive(Entity::null()));
+}

@@ -34,6 +34,11 @@ public:
         return em_.destroy(e);
     }
 
+    [[nodiscard]] bool is_alive(Entity e) const noexcept
+    {
+        return em_.is_alive(e);
+    }
+
     template <typename T>
     ComponentPool<T>& pool()
     {

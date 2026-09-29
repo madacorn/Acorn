@@ -55,6 +55,23 @@ int main() {
     return 0;
 }
 ```
+## API
+
+### World
+
+| Method | Description |
+| :--- | :--- |
+| `create_entity()` | Creates a new entity and returns its handle. |
+| `destroy_entity(e)` | Removes all components of `e` and frees its handle. Returns `false` if `e` was not alive. |
+| `is_alive(e)` | `true` if `e` refers to a live entity. `false` for `Entity::null()`, destroyed entities, and stale handles whose slot was reused (different generation). Use it to validate handles stored in components. |
+| `add<T>(e, args...)` | Adds (or overwrites) component `T` on `e`. |
+| `remove<T>(e)` | Removes component `T` from `e`. |
+| `has<T>(e)` / `get<T>(e)` / `try_get<T>(e)` | Component queries. `get` throws if absent, `try_get` returns `nullptr`. |
+| `view<Ts...>()` | Iterates entities that have all of `Ts`. On a `const World`, a component type that was never used yields an empty view. |
+| `view_exclude<Ts...>(Exclude<Us...>{})` | Like `view`, skipping entities that have any of `Us`. |
+| `defer_remove<T>(e)` / `defer_destroy(e)` / `flush()` | Queue structural changes and apply them later. |
+| `clear()` | Removes all entities and components. |
+
 ## Core Components
 * **World**: The central container managing the EntityManager and ComponentPools.
 
