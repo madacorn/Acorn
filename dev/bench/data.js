@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790685616265,
+  "lastUpdate": 1790685952018,
   "repoUrl": "https://github.com/madacorn/Acorn",
   "entries": {
     "Benchmark": [
@@ -1422,6 +1422,216 @@ window.BENCHMARK_DATA = {
             "value": 658005.3818010744,
             "unit": "ns/iter",
             "extra": "iterations: 1066\ncpu: 657965.9559099431 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "codingstain@gmail.com",
+            "name": "madacorn",
+            "username": "madacorn"
+          },
+          "committer": {
+            "email": "codingstain@gmail.com",
+            "name": "madacorn",
+            "username": "madacorn"
+          },
+          "distinct": true,
+          "id": "673a3028d47a20cb10cc04ab477cc40617a9fbdb",
+          "message": "Remove EntityManager dependency from ComponentPool",
+          "timestamp": "2026-09-29T14:42:32+02:00",
+          "tree_id": "5039b7f97e98e6b4bad7ecf7990737a907351916",
+          "url": "https://github.com/madacorn/Acorn/commit/673a3028d47a20cb10cc04ab477cc40617a9fbdb"
+        },
+        "date": 1790685951210,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_EntityCreation",
+            "value": 3.8016752996421803,
+            "unit": "ns/iter",
+            "extra": "iterations: 186871645\ncpu: 3.8013470636489552 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ComponentAdd",
+            "value": 15.369287803975883,
+            "unit": "ns/iter",
+            "extra": "iterations: 45466752\ncpu: 15.365571395995033 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/1000",
+            "value": 1457.0604297178206,
+            "unit": "ns/iter",
+            "extra": "iterations: 480641\ncpu: 1456.879779294733 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/4096",
+            "value": 5793.891185269336,
+            "unit": "ns/iter",
+            "extra": "iterations: 120673\ncpu: 5793.471555360355 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration/10000",
+            "value": 14268.097242974502,
+            "unit": "ns/iter",
+            "extra": "iterations: 48857\ncpu: 14267.032196000582 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/1000",
+            "value": 106.6736879236218,
+            "unit": "ns/iter",
+            "extra": "iterations: 6582677\ncpu: 106.67019071420331 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/4096",
+            "value": 289.36998179969254,
+            "unit": "ns/iter",
+            "extra": "iterations: 2420838\ncpu: 289.35414306946586 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SparseMatch/10000",
+            "value": 641.130262863957,
+            "unit": "ns/iter",
+            "extra": "iterations: 1092276\ncpu: 641.0844951276056 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/1000",
+            "value": 3384.150093127892,
+            "unit": "ns/iter",
+            "extra": "iterations: 206705\ncpu: 3384.0596695774207 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/4096",
+            "value": 14069.815730159366,
+            "unit": "ns/iter",
+            "extra": "iterations: 50578\ncpu: 14068.485369132826 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_SingleComponent/10000",
+            "value": 33910.708840424704,
+            "unit": "ns/iter",
+            "extra": "iterations: 20542\ncpu: 33909.977266088936 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_NoExclude/1000",
+            "value": 2689.905536067024,
+            "unit": "ns/iter",
+            "extra": "iterations: 259697\ncpu: 2689.6920950184253 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_NoExclude/4096",
+            "value": 14236.225297240613,
+            "unit": "ns/iter",
+            "extra": "iterations: 49539\ncpu: 14235.435717313654 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_NoExclude/32768",
+            "value": 108356.03041116973,
+            "unit": "ns/iter",
+            "extra": "iterations: 6445\ncpu: 108346.20310318065 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ViewIteration_NoExclude/100000",
+            "value": 285635.6933769381,
+            "unit": "ns/iter",
+            "extra": "iterations: 2446\ncpu: 285604.05437448894 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_NoneExcluded/1000",
+            "value": 3665.66896933283,
+            "unit": "ns/iter",
+            "extra": "iterations: 193399\ncpu: 3665.3295673710877 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_NoneExcluded/4096",
+            "value": 16683.81744296572,
+            "unit": "ns/iter",
+            "extra": "iterations: 42080\ncpu: 16682.272385931567 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_NoneExcluded/32768",
+            "value": 129298.43674977002,
+            "unit": "ns/iter",
+            "extra": "iterations: 5415\ncpu: 129283.35789473665 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_NoneExcluded/100000",
+            "value": 373129.1465746205,
+            "unit": "ns/iter",
+            "extra": "iterations: 1883\ncpu: 373099.80828465277 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_HalfExcluded/1000",
+            "value": 3354.5107172398716,
+            "unit": "ns/iter",
+            "extra": "iterations: 209149\ncpu: 3354.2872067282315 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_HalfExcluded/4096",
+            "value": 13786.236664489179,
+            "unit": "ns/iter",
+            "extra": "iterations: 50523\ncpu: 13785.120321437742 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_HalfExcluded/32768",
+            "value": 112035.93075813497,
+            "unit": "ns/iter",
+            "extra": "iterations: 6239\ncpu: 112024.5088956561 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_HalfExcluded/100000",
+            "value": 348405.63980099326,
+            "unit": "ns/iter",
+            "extra": "iterations: 2010\ncpu: 348385.83781094535 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_OneExcluded/1000",
+            "value": 3661.517068877664,
+            "unit": "ns/iter",
+            "extra": "iterations: 194301\ncpu: 3660.981899218223 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_OneExcluded/4096",
+            "value": 15102.825973077948,
+            "unit": "ns/iter",
+            "extra": "iterations: 46579\ncpu: 15102.180875501803 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_OneExcluded/32768",
+            "value": 129641.30066568092,
+            "unit": "ns/iter",
+            "extra": "iterations: 5408\ncpu: 129630.50591715981 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_OneExcluded/100000",
+            "value": 399819.62129840034,
+            "unit": "ns/iter",
+            "extra": "iterations: 1756\ncpu: 399795.6326879259 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_MultipleExcludeTags/1000",
+            "value": 3856.866296061899,
+            "unit": "ns/iter",
+            "extra": "iterations: 181685\ncpu: 3856.541877425214 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_MultipleExcludeTags/4096",
+            "value": 15867.757212464394,
+            "unit": "ns/iter",
+            "extra": "iterations: 44125\ncpu: 15866.806730878174 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_MultipleExcludeTags/32768",
+            "value": 129019.22721390148,
+            "unit": "ns/iter",
+            "extra": "iterations: 5409\ncpu: 129005.07395082213 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExcludeView_MultipleExcludeTags/100000",
+            "value": 400702.8208357202,
+            "unit": "ns/iter",
+            "extra": "iterations: 1747\ncpu: 400683.26273611933 ns\nthreads: 1"
           }
         ]
       }
