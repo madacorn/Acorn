@@ -279,3 +279,66 @@ TEST(WorldTest, ClearResetsEverything)
     auto e2 = world.create_entity();
     EXPECT_EQ(e2.index, 0);
 }
+
+TEST(WorldTest, ConstViewOfUnregisteredComponentIsEmpty)
+{
+    const World w;
+
+    size_t count = 0;
+    auto iterate = [&]
+    {
+        for (auto [e, a] : w.view<CompA>())
+        {
+            (void)e;
+            (void)a;
+            ++count;
+        }
+        w.view<CompA>().each([&](Entity, const CompA&) { ++count; });
+    };
+    EXPECT_NO_THROW(iterate());
+    EXPECT_EQ(count, 0);
+}
+
+TEST(WorldTest, ConstViewWithOneUnregisteredComponentIsEmpty)
+{
+    World w;
+    for (int i = 0; i < 3; ++i) w.add<CompA>(w.create_entity(), CompA{i});
+
+    const World& cw = w;
+    size_t count = 0;
+    auto iterate = [&]
+    {
+        for (auto [e, a, b] : cw.view<CompA, CompB>())
+        {
+            (void)e;
+            (void)a;
+            (void)b;
+            ++count;
+        }
+        cw.view<CompA, CompB>().each([&](Entity, const CompA&, const CompB&) { ++count; });
+    };
+    EXPECT_NO_THROW(iterate());
+    EXPECT_EQ(count, 0);
+}
+
+TEST(WorldTest, ConstViewExcludeOfUnregisteredComponentExcludesNothing)
+{
+    World w;
+    std::vector<Entity> created;
+    for (int i = 0; i < 3; ++i)
+    {
+        Entity e = w.create_entity();
+        w.add<CompA>(e, CompA{i});
+        created.push_back(e);
+    }
+
+    const World& cw = w;
+    std::vector<Entity> seen;
+    auto iterate = [&]
+    {
+        cw.view_exclude<CompA>(Exclude<CompB>{})
+            .each([&](Entity e, const CompA&) { seen.push_back(e); });
+    };
+    EXPECT_NO_THROW(iterate());
+    EXPECT_EQ(seen, created);
+}

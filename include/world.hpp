@@ -122,10 +122,11 @@ public:
         return View{(pool<Components>())...};
     }
 
+    // A const view over a component type that has no pool yet is empty rather than throwing.
     template <typename... Components>
     [[nodiscard]] const auto view() const
     {
-        return View{pool<Components>()...};
+        return View{pool_or_empty<Components>()...};
     }
 
     template <typename... Components, typename... Excluded>
@@ -143,8 +144,8 @@ public:
     {
         return ExcludeView<std::tuple<const ComponentPool<Components>...>,
                            std::tuple<const ComponentPool<Excluded>...>>(
-            std::forward_as_tuple(pool<Components>()...),
-            std::forward_as_tuple(pool<Excluded>()...));
+            std::forward_as_tuple(pool_or_empty<Components>()...),
+            std::forward_as_tuple(pool_or_empty<Excluded>()...));
     }
 
     void clear()
@@ -194,6 +195,18 @@ private:
         if (it == pools_.end())
             return nullptr;
         return &static_cast<const PoolBox<T>*>(it->second.get())->pool;
+    }
+
+    // Returns the registered pool, or a shared empty pool when T has never been used.
+    template <typename T>
+    const ComponentPool<T>& pool_or_empty() const
+    {
+        if (const auto* p = try_pool<T>())
+            return *p;
+
+        static const EntityManager empty_em;
+        static const ComponentPool<T> empty_pool(empty_em);
+        return empty_pool;
     }
 
     struct IPool
