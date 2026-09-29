@@ -83,11 +83,27 @@ TEST(WorldTest, GetAbsentThrows)
     EXPECT_THROW((void)w.get<CompA>(e), std::out_of_range);
 }
 
-TEST(WorldTest, ConstPoolMissingThrows)
+TEST(WorldTest, ConstPoolMissingIsEmpty)
 {
     const World w;
 
-    EXPECT_THROW((void)w.pool<int>(), std::runtime_error);
+    const ComponentPool<int>* p = nullptr;
+    EXPECT_NO_THROW(p = &w.pool<int>());
+    EXPECT_TRUE(p->empty());
+    EXPECT_FALSE(p->has(Entity{0, 0}));
+    EXPECT_EQ(p->try_get(Entity{0, 0}), nullptr);
+    EXPECT_EQ(&w.pool<int>(), p);
+}
+
+TEST(WorldTest, ConstPoolReturnsRealPoolOnceRegistered)
+{
+    World w;
+    Entity e = w.create_entity();
+    w.add<int>(e, 5);
+
+    const World& cw = w;
+    EXPECT_EQ(&cw.pool<int>(), &w.pool<int>());
+    EXPECT_EQ(cw.pool<int>().size(), 1u);
 }
 
 TEST(WorldTest, TryGetReturnsNullWhenPoolMissingOrAbsent)

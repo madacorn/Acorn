@@ -88,17 +88,16 @@ public:
         return static_cast<PoolBox<T>*>(it->second.get())->pool;
     }
 
+    // Returns a shared empty pool when T has never been used, so read-only callers never throw.
     template <typename T>
     const ComponentPool<T>& pool() const
     {
-        const auto key = std::type_index(typeid(T));
-        auto it = pools_.find(key);
-        if (it == pools_.end())
-        {
-            throw std::runtime_error(
-                "ComponentPool requested for type not yet registered in World.");
-        }
-        return static_cast<const PoolBox<T>*>(it->second.get())->pool;
+        if (const auto* p = try_pool<T>())
+            return *p;
+
+        static const EntityManager empty_em;
+        static const ComponentPool<T> empty_pool(empty_em);
+        return empty_pool;
     }
 
     template <typename T>
@@ -165,7 +164,7 @@ public:
     template <typename... Components>
     [[nodiscard]] const auto view() const
     {
-        return View{pool_or_empty<Components>()...};
+        return View{pool<Components>()...};
     }
 
     template <typename... Components, typename... Excluded>
@@ -183,8 +182,8 @@ public:
     {
         return ExcludeView<std::tuple<const ComponentPool<Components>...>,
                            std::tuple<const ComponentPool<Excluded>...>>(
-            std::forward_as_tuple(pool_or_empty<Components>()...),
-            std::forward_as_tuple(pool_or_empty<Excluded>()...));
+            std::forward_as_tuple(pool<Components>()...),
+            std::forward_as_tuple(pool<Excluded>()...));
     }
 
     // Bulk reset: removes every entity and component without firing destroy listeners.
@@ -329,18 +328,6 @@ private:
         if (it == pools_.end())
             return nullptr;
         return &static_cast<const PoolBox<T>*>(it->second.get())->pool;
-    }
-
-    // Returns the registered pool, or a shared empty pool when T has never been used.
-    template <typename T>
-    const ComponentPool<T>& pool_or_empty() const
-    {
-        if (const auto* p = try_pool<T>())
-            return *p;
-
-        static const EntityManager empty_em;
-        static const ComponentPool<T> empty_pool(empty_em);
-        return empty_pool;
     }
 
     struct IPool

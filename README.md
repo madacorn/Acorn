@@ -67,7 +67,7 @@ int main() {
 | `add<T>(e, args...)` | Adds (or overwrites) component `T` on `e`. |
 | `remove<T>(e)` | Removes component `T` from `e`. |
 | `has<T>(e)` / `get<T>(e)` / `try_get<T>(e)` | Component queries. `get` throws if absent, `try_get` returns `nullptr`. |
-| `view<Ts...>()` | Iterates entities that have all of `Ts`. On a `const World`, a component type that was never used yields an empty view. |
+| `view<Ts...>()` | Iterates entities that have all of `Ts`. On a `const World`, a component type that was never used yields an empty view (and `pool<T>()` returns an empty pool). |
 | `view_exclude<Ts...>(Exclude<Us...>{})` | Like `view`, skipping entities that have any of `Us`. |
 | `defer_remove<T>(e)` / `defer_destroy(e)` / `flush()` | Queue structural changes and apply them later. |
 | `export_entities()` / `import_entities(state)` | Snapshot and restore the exact entity manager state. See [Save and load](#save-and-load). |
