@@ -26,6 +26,8 @@ if (BUILD_TESTS)
 
     add_executable(${PROJECT_NAME}_tests ${TEST_SOURCES})
     target_link_libraries(${PROJECT_NAME}_tests PRIVATE ${PROJECT_NAME} gtest_main)
+    # The library's own tests walk every pool after every change, not just the slots touched.
+    target_compile_definitions(${PROJECT_NAME}_tests PRIVATE ACORN_FULL_INVARIANT_CHECKS)
 
     include(GoogleTest)
     gtest_discover_tests(${PROJECT_NAME}_tests)

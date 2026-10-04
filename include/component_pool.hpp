@@ -90,7 +90,7 @@ public:
             dense_data_[pos] = T(std::forward<Args>(args)...);
 
 #ifndef NDEBUG
-            debug_check_invariants();
+            debug_check_slot(pos);
 #endif
             return dense_data_[pos];
         }
@@ -103,7 +103,7 @@ public:
             sparse_[e.index] = pos;
 
 #ifndef NDEBUG
-            debug_check_invariants();
+            debug_check_slot(pos);
 #endif
             return dense_data_.back();
         }
@@ -131,7 +131,13 @@ public:
         dense_entities_.pop_back();
 
 #ifndef NDEBUG
-        debug_check_invariants();
+        ACORN_ASSERT(sparse_[e.index] == kAbsent);
+        if (pos < dense_entities_.size())
+            debug_check_slot(pos); // the entity moved into the hole
+#ifdef ACORN_FULL_INVARIANT_CHECKS
+        else
+            debug_check_invariants();
+#endif
 #endif
         return true;
     }
@@ -190,6 +196,21 @@ public:
 
 private:
 #ifndef NDEBUG
+    // After each change, debug builds check the slots it touched: the dense entry and its back
+    // pointer, and the dense and sparse arrays still the same length. That is constant time, so
+    // pools of tens of thousands stay quick to fill. Define ACORN_FULL_INVARIANT_CHECKS to walk
+    // the whole pool each time as well (the library's own tests do).
+    void debug_check_slot(size_t pos) const
+    {
+        ACORN_ASSERT(dense_entities_.size() == dense_data_.size());
+        const Entity e = dense_entities_[pos];
+        ACORN_ASSERT(e.index < sparse_.size());
+        ACORN_ASSERT(sparse_[e.index] == pos);
+#ifdef ACORN_FULL_INVARIANT_CHECKS
+        debug_check_invariants();
+#endif
+    }
+
     void debug_check_invariants() const
     {
         ACORN_ASSERT(dense_entities_.size() == dense_data_.size());
